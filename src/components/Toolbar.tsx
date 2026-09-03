@@ -401,17 +401,20 @@ export default function Toolbar({
                 >
                   選択削除
                 </button>
+                <div className="my-1 border-t border-zinc-200" />
+                <button
+                  onClick={() => {
+                    setOpenMenu(null);
+                    onOpenLeadTime();
+                  }}
+                  className={menuItemClass}
+                  title="所要時間欄から、開始から終了までのリードタイムを集計します"
+                >
+                  リードタイム
+                </button>
               </div>
             )}
           </div>
-
-          <button
-            onClick={onOpenLeadTime}
-            className={menuButtonClass}
-            title="所要時間欄から、開始から終了までのリードタイムを集計します"
-          >
-            リードタイム
-          </button>
 
           <div ref={exportAnchorRef} className="relative flex items-center">
             <button
