@@ -7,10 +7,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this is
 
 A Next.js (App Router) swimlane/BPM workflow diagram editor built on React Flow
-(`@xyflow/react`), for back-office processes (見積/契約/請求/更新 etc.). Deployed at
-`https://ai.mnbs.net/workflow` behind nginx, gated by Cognito Hosted UI login, running
-as a systemd service on `127.0.0.1:8002`. There is no test suite — verification is
-`tsc --noEmit` + `next build` + `eslint`, plus manual/Playwright-driven browser checks.
+(`@xyflow/react`), for back-office processes (見積/契約/請求/更新 etc.). This deployment runs
+behind nginx as a systemd service, gated by Cognito Hosted UI login - see `nginx/` and
+`systemd/` (both host-specific, kept out of the public mirror - see
+`scripts/publish-public-mirror.sh`) for the actual domain/port. There is no test suite —
+verification is `tsc --noEmit` + `next build` + `eslint`, plus manual/Playwright-driven
+browser checks.
 
 ## Documentation
 
