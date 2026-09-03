@@ -61,6 +61,8 @@ interface ToolbarProps {
   previewing: boolean;
 }
 
+type MenuKey = "align" | "file" | "tools" | "export" | null;
+
 export default function Toolbar({
   name,
   onNameChange,
@@ -96,8 +98,8 @@ export default function Toolbar({
   onClear,
   previewing,
 }: ToolbarProps) {
-  const [openMenu, setOpenMenu] = useState<"save" | "align" | null>(null);
-  // Both menus hang off buttons that move as the toolbar wraps on a narrow
+  const [openMenu, setOpenMenu] = useState<MenuKey>(null);
+  // Every menu hangs off a button that moves as the toolbar wraps on a narrow
   // screen, so each is kept inside the window rather than trusting its class.
   // Destructured rather than held as objects: reading `menu.anchorRef` in the
   // JSX counts as accessing a ref during render (react-hooks/refs).
@@ -107,10 +109,20 @@ export default function Toolbar({
     style: alignMenuStyle,
   } = useDropdownPlacement(openMenu === "align", "left");
   const {
-    anchorRef: saveAnchorRef,
-    menuRef: saveMenuRef,
-    style: saveMenuStyle,
-  } = useDropdownPlacement(openMenu === "save", "right");
+    anchorRef: fileAnchorRef,
+    menuRef: fileMenuRef,
+    style: fileMenuStyle,
+  } = useDropdownPlacement(openMenu === "file", "left");
+  const {
+    anchorRef: toolsAnchorRef,
+    menuRef: toolsMenuRef,
+    style: toolsMenuStyle,
+  } = useDropdownPlacement(openMenu === "tools", "left");
+  const {
+    anchorRef: exportAnchorRef,
+    menuRef: exportMenuRef,
+    style: exportMenuStyle,
+  } = useDropdownPlacement(openMenu === "export", "left");
   const headerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -136,12 +148,24 @@ export default function Toolbar({
     { label: "縦に等間隔", run: () => onDistribute("vertical"), needs: 3 },
   ];
 
+  const menuItemClass =
+    "block w-full px-3 py-2 text-left text-sm text-zinc-700 hover:bg-zinc-100 disabled:opacity-40 disabled:hover:bg-transparent";
+  const menuButtonClass =
+    "rounded border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-100";
+
   return (
     <header
       ref={headerRef}
       className="flex flex-wrap items-center gap-3 border-b border-zinc-200 bg-white px-4 py-2"
     >
-      <h1 className="mr-2 text-sm font-semibold text-zinc-800">ワークフロービルダー</h1>
+      <h1 className="text-sm font-semibold text-zinc-800">ワークフロービルダー</h1>
+      <button
+        onClick={onClear}
+        disabled={previewing}
+        className="rounded border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-500 hover:bg-red-50 hover:text-red-600 disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-zinc-500"
+      >
+        新規作成
+      </button>
       <input
         value={name}
         onChange={(e) => onNameChange(e.target.value)}
@@ -190,31 +214,6 @@ export default function Toolbar({
             </button>
           </div>
 
-          <div className="flex items-center overflow-hidden rounded border border-zinc-300 text-sm font-medium">
-            <button
-              onClick={() => orientation !== "horizontal" && onToggleOrientation()}
-              className={`px-3 py-1.5 ${
-                orientation === "horizontal"
-                  ? "bg-zinc-800 text-white"
-                  : "bg-white text-zinc-600 hover:bg-zinc-100"
-              }`}
-              title="レーンを横長の帯として上下に並べ、工程を左→右に流す"
-            >
-              横
-            </button>
-            <button
-              onClick={() => orientation !== "vertical" && onToggleOrientation()}
-              className={`border-l border-zinc-300 px-3 py-1.5 ${
-                orientation === "vertical"
-                  ? "bg-zinc-800 text-white"
-                  : "bg-white text-zinc-600 hover:bg-zinc-100"
-              }`}
-              title="レーンを縦長の帯として左右に並べ、工程を上→下に流す"
-            >
-              縦
-            </button>
-          </div>
-
           <button
             onClick={onAutoLayout}
             className="rounded border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-100"
@@ -247,7 +246,7 @@ export default function Toolbar({
                       entry.run();
                     }}
                     disabled={selectedNodeCount < entry.needs}
-                    className="block w-full px-3 py-1.5 text-left text-sm text-zinc-700 hover:bg-zinc-100 disabled:opacity-40 disabled:hover:bg-transparent"
+                    className={menuItemClass}
                     title={
                       selectedNodeCount < entry.needs
                         ? `部品を${entry.needs}つ以上選んでください`
@@ -261,55 +260,48 @@ export default function Toolbar({
             )}
           </div>
 
-          <select
-            value=""
-            onChange={(e) => {
-              if (e.target.value) onSelectTemplate(e.target.value);
-              e.target.value = "";
-            }}
-            className="rounded border border-zinc-300 px-2 py-1.5 text-sm text-zinc-700"
-            title="定型フローから作成"
-          >
-            <option value="" disabled>
-              テンプレート▾
-            </option>
-            {WORKFLOW_TEMPLATES.map((t) => (
-              <option key={t.id} value={t.id} title={t.description}>
-                {t.name}
-              </option>
-            ))}
-          </select>
-
-          <div ref={saveAnchorRef} className="relative flex items-center">
+          <div ref={fileAnchorRef} className="relative flex items-center">
             <button
-              onClick={onSave}
-              disabled={saving}
-              className="rounded-l bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-60"
-              title="同じフローに上書き保存する (Ctrl+S)"
+              onClick={() => setOpenMenu((v) => (v === "file" ? null : "file"))}
+              className={menuButtonClass}
+              aria-expanded={openMenu === "file"}
             >
-              {saving ? "保存中…" : "保存"}
+              ファイル▾
             </button>
-            <button
-              onClick={() => setOpenMenu((v) => (v === "save" ? null : "save"))}
-              disabled={saving}
-              className="rounded-r border-l border-emerald-700 bg-emerald-600 px-2 py-1.5 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-60"
-              title="保存の種類を選ぶ"
-              aria-expanded={openMenu === "save"}
-            >
-              ▾
-            </button>
-            {openMenu === "save" && (
+            {openMenu === "file" && (
               <div
-                ref={saveMenuRef}
-                style={saveMenuStyle}
-                className="absolute right-0 top-full z-20 mt-1 w-56 rounded border border-zinc-200 bg-white py-1 shadow-lg"
+                ref={fileMenuRef}
+                style={fileMenuStyle}
+                className="absolute left-0 top-full z-20 mt-1 w-56 rounded border border-zinc-200 bg-white py-1 shadow-lg"
               >
+                <button
+                  onClick={() => {
+                    setOpenMenu(null);
+                    onOpenLibrary();
+                  }}
+                  className={menuItemClass}
+                >
+                  開く…
+                </button>
+                <div className="my-1 border-t border-zinc-200" />
+                <button
+                  onClick={() => {
+                    setOpenMenu(null);
+                    onSave();
+                  }}
+                  disabled={saving}
+                  className={menuItemClass}
+                  title="同じフローに上書き保存する (Ctrl+S)"
+                >
+                  {saving ? "保存中…" : "保存"}
+                </button>
                 <button
                   onClick={() => {
                     setOpenMenu(null);
                     onSaveAs();
                   }}
-                  className="block w-full px-3 py-2 text-left text-sm text-zinc-700 hover:bg-zinc-100"
+                  disabled={saving}
+                  className={menuItemClass}
                 >
                   名前を付けて保存…
                   <span className="block text-xs text-zinc-400">別のフローとして新しく保存します</span>
@@ -320,75 +312,159 @@ export default function Toolbar({
                     onOpenHistory();
                   }}
                   disabled={!canOpenHistory}
-                  className="block w-full px-3 py-2 text-left text-sm text-zinc-700 hover:bg-zinc-100 disabled:opacity-40 disabled:hover:bg-transparent"
+                  className={menuItemClass}
                   title={canOpenHistory ? undefined : "一度保存すると履歴が残ります"}
                 >
                   保存履歴…
                   <span className="block text-xs text-zinc-400">過去の保存内容に戻せます</span>
                 </button>
+                <div className="my-1 border-t border-zinc-200" />
+                <button
+                  onClick={() => {
+                    setOpenMenu(null);
+                    onDownload();
+                  }}
+                  className={menuItemClass}
+                  title="現在のワークフローをJSONファイルとしてローカルに保存"
+                >
+                  ローカル保存
+                </button>
               </div>
             )}
           </div>
-          <button
-            onClick={onOpenLibrary}
-            className="rounded border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-100"
-          >
-            開く
-          </button>
+
+          <div ref={toolsAnchorRef} className="relative flex items-center">
+            <button
+              onClick={() => setOpenMenu((v) => (v === "tools" ? null : "tools"))}
+              className={menuButtonClass}
+              aria-expanded={openMenu === "tools"}
+            >
+              ツール▾
+            </button>
+            {openMenu === "tools" && (
+              <div
+                ref={toolsMenuRef}
+                style={toolsMenuStyle}
+                className="absolute left-0 top-full z-20 mt-1 w-56 rounded border border-zinc-200 bg-white py-1 shadow-lg"
+              >
+                <div className="px-3 py-1.5 text-xs font-semibold text-zinc-400">テンプレートから作成</div>
+                {WORKFLOW_TEMPLATES.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => {
+                      setOpenMenu(null);
+                      onSelectTemplate(t.id);
+                    }}
+                    title={t.description}
+                    className={menuItemClass}
+                  >
+                    {t.name}
+                  </button>
+                ))}
+                <div className="my-1 border-t border-zinc-200" />
+                <div className="flex items-center justify-between px-3 py-1.5">
+                  <span className="text-sm text-zinc-700">レーンの向き</span>
+                  <div className="flex items-center overflow-hidden rounded border border-zinc-300 text-sm font-medium">
+                    <button
+                      onClick={() => orientation !== "horizontal" && onToggleOrientation()}
+                      className={`px-2.5 py-1 ${
+                        orientation === "horizontal"
+                          ? "bg-zinc-800 text-white"
+                          : "bg-white text-zinc-600 hover:bg-zinc-100"
+                      }`}
+                      title="レーンを横長の帯として上下に並べ、工程を左→右に流す"
+                    >
+                      横
+                    </button>
+                    <button
+                      onClick={() => orientation !== "vertical" && onToggleOrientation()}
+                      className={`border-l border-zinc-300 px-2.5 py-1 ${
+                        orientation === "vertical"
+                          ? "bg-zinc-800 text-white"
+                          : "bg-white text-zinc-600 hover:bg-zinc-100"
+                      }`}
+                      title="レーンを縦長の帯として左右に並べ、工程を上→下に流す"
+                    >
+                      縦
+                    </button>
+                  </div>
+                </div>
+                <div className="my-1 border-t border-zinc-200" />
+                <button
+                  onClick={() => {
+                    setOpenMenu(null);
+                    onDeleteSelected();
+                  }}
+                  disabled={!hasSelection}
+                  className={`${menuItemClass} hover:bg-red-50 hover:text-red-600 disabled:hover:bg-transparent disabled:hover:text-zinc-700`}
+                  title="選択した部品・線を削除（部品・線を右クリック、またはBackspace/Deleteキーでも削除できます）"
+                >
+                  選択削除
+                </button>
+              </div>
+            )}
+          </div>
+
           <button
             onClick={onOpenLeadTime}
-            className="rounded border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-100"
+            className={menuButtonClass}
             title="所要時間欄から、開始から終了までのリードタイムを集計します"
           >
             リードタイム
           </button>
-          <button
-            onClick={onDownload}
-            className="rounded border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-100"
-            title="現在のワークフローをJSONファイルとしてローカルに保存"
-          >
-            ローカル保存
-          </button>
-          <button
-            onClick={onExportPdf}
-            disabled={exporting !== null}
-            className="rounded border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-100 disabled:opacity-60"
-            title="ルートフローとすべてのサブフローを、1ページずつPDFに書き出す"
-          >
-            {exporting ? `PDF出力中… ${exporting.done}/${exporting.total}` : "PDF出力"}
-          </button>
-          <button
-            onClick={onExportExcel}
-            disabled={excelExporting || !canExportExcel}
-            className="rounded border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-100 disabled:opacity-60"
-            title={
-              canExportExcel
-                ? "ルートフローとすべてのサブフローを、Excelの図形（縦レーン＋基本図形）としてシート1枚ずつ書き出す"
-                : "レーンが「縦」のときだけ書き出せます（ツールバーの 横／縦 で切り替え）"
-            }
-          >
-            {excelExporting ? "Excel出力中…" : "Excel出力"}
-          </button>
-          <button
-            onClick={onCopyImage}
-            className="rounded border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-100"
-          >
-            画像コピー
-          </button>
-          <button
-            onClick={onDeleteSelected}
-            disabled={!hasSelection}
-            className="rounded border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-red-50 hover:text-red-600 disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-zinc-700"
-            title="選択した部品・線を削除（部品・線を右クリック、またはBackspace/Deleteキーでも削除できます）"
-          >
-            選択削除
-          </button>
-          <button
-            onClick={onClear}
-            className="rounded border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-500 hover:bg-red-50 hover:text-red-600"
-          >
-            クリア
-          </button>
+
+          <div ref={exportAnchorRef} className="relative flex items-center">
+            <button
+              onClick={() => setOpenMenu((v) => (v === "export" ? null : "export"))}
+              className={menuButtonClass}
+              aria-expanded={openMenu === "export"}
+            >
+              エクスポート▾
+            </button>
+            {openMenu === "export" && (
+              <div
+                ref={exportMenuRef}
+                style={exportMenuStyle}
+                className="absolute left-0 top-full z-20 mt-1 w-56 rounded border border-zinc-200 bg-white py-1 shadow-lg"
+              >
+                <button
+                  onClick={() => {
+                    setOpenMenu(null);
+                    onExportPdf();
+                  }}
+                  disabled={exporting !== null}
+                  className={menuItemClass}
+                  title="ルートフローとすべてのサブフローを、1ページずつPDFに書き出す"
+                >
+                  {exporting ? `PDF出力中… ${exporting.done}/${exporting.total}` : "PDF出力"}
+                </button>
+                <button
+                  onClick={() => {
+                    setOpenMenu(null);
+                    onExportExcel();
+                  }}
+                  disabled={excelExporting || !canExportExcel}
+                  className={menuItemClass}
+                  title={
+                    canExportExcel
+                      ? "ルートフローとすべてのサブフローを、Excelの図形（縦レーン＋基本図形）としてシート1枚ずつ書き出す"
+                      : "レーンが「縦」のときだけ書き出せます（ツールバーの ツール→レーンの向き で切り替え）"
+                  }
+                >
+                  {excelExporting ? "Excel出力中…" : "Excel出力"}
+                </button>
+                <button
+                  onClick={() => {
+                    setOpenMenu(null);
+                    onCopyImage();
+                  }}
+                  className={menuItemClass}
+                >
+                  画像コピー
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </fieldset>
 

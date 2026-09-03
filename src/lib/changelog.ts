@@ -29,6 +29,12 @@ export interface ChangelogEntry {
 /** Newest first - the dialog renders this order as-is. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "4.0.0",
+    date: "2026-09-03T13:35:00Z",
+    title:
+      "ツールバーのボタンを「ファイル」「ツール」「エクスポート」にまとめ、「クリア」を「新規作成」としてフロー名の左に移動した",
+  },
+  {
     version: "3.9.0",
     date: "2026-09-03T13:10:00Z",
     title: "⚙️メニューに「ライセンス」を追加し、使用しているOSS一覧を表示できるようにした",

@@ -1,6 +1,6 @@
 {
   "name": "bpm-canvas",
-  "version": "3.9.3",
+  "version": "4.0.0",
   "private": true,
   "license": "MIT",
   "scripts": {
