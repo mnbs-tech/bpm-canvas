@@ -10,6 +10,9 @@ const COGNITO_USER_POOL_ID = process.env.COGNITO_USER_POOL_ID || "";
 const COGNITO_CLIENT_ID = process.env.COGNITO_CLIENT_ID || "";
 const COGNITO_CLIENT_SECRET = process.env.COGNITO_CLIENT_SECRET || "";
 const COGNITO_DOMAIN = process.env.COGNITO_DOMAIN || "";
+// No hardcoded fallback beyond "": the real value always comes from the env
+// (see systemd/workflow-builder.service) - baking a specific deployment's own
+// URL in here as a default would be wrong for anyone else running this code.
 const COGNITO_REDIRECT_URI = process.env.COGNITO_REDIRECT_URI || "";
 const COGNITO_LOGOUT_REDIRECT_URI = process.env.COGNITO_LOGOUT_REDIRECT_URI || "";
 

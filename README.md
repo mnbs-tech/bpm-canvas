@@ -70,8 +70,9 @@ src/
     Toolbar.tsx  Sidebar.tsx  ChatPanel.tsx  LaneBackground.tsx
     ProposalBanner.tsx          # AIの提案のプレビューと反映/取り消し
     WorkflowLibraryModal.tsx  VersionHistoryModal.tsx
-    AppInfoMenu.tsx             # 右上の⚙️（版情報・変更履歴・仕様書DL・一式DL）
+    AppInfoMenu.tsx             # 右上の⚙️（版情報・変更履歴・ライセンス・仕様書DL・一式DL）
     ChangelogModal.tsx          # アプリの変更履歴ダイアログ
+    LicensesModal.tsx           # 使用OSS一覧ダイアログ
     nodes/                      # ノード種別ごとの見た目（index.ts で nodeTypes に登録）
   lib/
     types.ts                    # WorkflowDocument をはじめとする型と定数
@@ -126,6 +127,10 @@ npm run kit        # dist/workflow-builder-kit-vX.Y.Z.zip
 
 機能を追加・変更するコミットでは、**同じコミットの中で関連ドキュメントも更新します**。
 どの変更でどの文書を直すかの対応表は `CLAUDE.md` の「Updating docs is part of the change」節にあります。
+
+## ライセンス
+
+MIT License. 詳細は [`LICENSE`](LICENSE) を参照してください。
 
 ## 技術スタック
 
