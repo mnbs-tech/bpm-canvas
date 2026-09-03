@@ -29,6 +29,11 @@ export interface ChangelogEntry {
 /** Newest first - the dialog renders this order as-is. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "4.0.2",
+    date: "2026-09-03T14:15:00Z",
+    title: "「ツール▾」をフロー名と元に戻す/やり直すの間に移動した",
+  },
+  {
     version: "4.0.1",
     date: "2026-09-03T14:00:00Z",
     title: "「リードタイム」をツールバー直置きから「ツール▾」の中に移動した",

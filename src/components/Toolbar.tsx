@@ -195,6 +195,89 @@ export default function Toolbar({
 
       <fieldset disabled={previewing} className="contents">
         <div className="ml-auto flex flex-wrap items-center gap-2">
+          <div ref={toolsAnchorRef} className="relative flex items-center">
+            <button
+              onClick={() => setOpenMenu((v) => (v === "tools" ? null : "tools"))}
+              className={menuButtonClass}
+              aria-expanded={openMenu === "tools"}
+            >
+              ツール▾
+            </button>
+            {openMenu === "tools" && (
+              <div
+                ref={toolsMenuRef}
+                style={toolsMenuStyle}
+                className="absolute left-0 top-full z-20 mt-1 w-56 rounded border border-zinc-200 bg-white py-1 shadow-lg"
+              >
+                <div className="px-3 py-1.5 text-xs font-semibold text-zinc-400">テンプレートから作成</div>
+                {WORKFLOW_TEMPLATES.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => {
+                      setOpenMenu(null);
+                      onSelectTemplate(t.id);
+                    }}
+                    title={t.description}
+                    className={menuItemClass}
+                  >
+                    {t.name}
+                  </button>
+                ))}
+                <div className="my-1 border-t border-zinc-200" />
+                <div className="flex items-center justify-between px-3 py-1.5">
+                  <span className="text-sm text-zinc-700">レーンの向き</span>
+                  <div className="flex items-center overflow-hidden rounded border border-zinc-300 text-sm font-medium">
+                    <button
+                      onClick={() => orientation !== "horizontal" && onToggleOrientation()}
+                      className={`px-2.5 py-1 ${
+                        orientation === "horizontal"
+                          ? "bg-zinc-800 text-white"
+                          : "bg-white text-zinc-600 hover:bg-zinc-100"
+                      }`}
+                      title="レーンを横長の帯として上下に並べ、工程を左→右に流す"
+                    >
+                      横
+                    </button>
+                    <button
+                      onClick={() => orientation !== "vertical" && onToggleOrientation()}
+                      className={`border-l border-zinc-300 px-2.5 py-1 ${
+                        orientation === "vertical"
+                          ? "bg-zinc-800 text-white"
+                          : "bg-white text-zinc-600 hover:bg-zinc-100"
+                      }`}
+                      title="レーンを縦長の帯として左右に並べ、工程を上→下に流す"
+                    >
+                      縦
+                    </button>
+                  </div>
+                </div>
+                <div className="my-1 border-t border-zinc-200" />
+                <button
+                  onClick={() => {
+                    setOpenMenu(null);
+                    onDeleteSelected();
+                  }}
+                  disabled={!hasSelection}
+                  className={`${menuItemClass} hover:bg-red-50 hover:text-red-600 disabled:hover:bg-transparent disabled:hover:text-zinc-700`}
+                  title="選択した部品・線を削除（部品・線を右クリック、またはBackspace/Deleteキーでも削除できます）"
+                >
+                  選択削除
+                </button>
+                <div className="my-1 border-t border-zinc-200" />
+                <button
+                  onClick={() => {
+                    setOpenMenu(null);
+                    onOpenLeadTime();
+                  }}
+                  className={menuItemClass}
+                  title="所要時間欄から、開始から終了までのリードタイムを集計します"
+                >
+                  リードタイム
+                </button>
+              </div>
+            )}
+          </div>
+
           <div className="flex items-center overflow-hidden rounded border border-zinc-300 text-sm font-medium">
             <button
               onClick={onUndo}
@@ -328,89 +411,6 @@ export default function Toolbar({
                   title="現在のワークフローをJSONファイルとしてローカルに保存"
                 >
                   ローカル保存
-                </button>
-              </div>
-            )}
-          </div>
-
-          <div ref={toolsAnchorRef} className="relative flex items-center">
-            <button
-              onClick={() => setOpenMenu((v) => (v === "tools" ? null : "tools"))}
-              className={menuButtonClass}
-              aria-expanded={openMenu === "tools"}
-            >
-              ツール▾
-            </button>
-            {openMenu === "tools" && (
-              <div
-                ref={toolsMenuRef}
-                style={toolsMenuStyle}
-                className="absolute left-0 top-full z-20 mt-1 w-56 rounded border border-zinc-200 bg-white py-1 shadow-lg"
-              >
-                <div className="px-3 py-1.5 text-xs font-semibold text-zinc-400">テンプレートから作成</div>
-                {WORKFLOW_TEMPLATES.map((t) => (
-                  <button
-                    key={t.id}
-                    onClick={() => {
-                      setOpenMenu(null);
-                      onSelectTemplate(t.id);
-                    }}
-                    title={t.description}
-                    className={menuItemClass}
-                  >
-                    {t.name}
-                  </button>
-                ))}
-                <div className="my-1 border-t border-zinc-200" />
-                <div className="flex items-center justify-between px-3 py-1.5">
-                  <span className="text-sm text-zinc-700">レーンの向き</span>
-                  <div className="flex items-center overflow-hidden rounded border border-zinc-300 text-sm font-medium">
-                    <button
-                      onClick={() => orientation !== "horizontal" && onToggleOrientation()}
-                      className={`px-2.5 py-1 ${
-                        orientation === "horizontal"
-                          ? "bg-zinc-800 text-white"
-                          : "bg-white text-zinc-600 hover:bg-zinc-100"
-                      }`}
-                      title="レーンを横長の帯として上下に並べ、工程を左→右に流す"
-                    >
-                      横
-                    </button>
-                    <button
-                      onClick={() => orientation !== "vertical" && onToggleOrientation()}
-                      className={`border-l border-zinc-300 px-2.5 py-1 ${
-                        orientation === "vertical"
-                          ? "bg-zinc-800 text-white"
-                          : "bg-white text-zinc-600 hover:bg-zinc-100"
-                      }`}
-                      title="レーンを縦長の帯として左右に並べ、工程を上→下に流す"
-                    >
-                      縦
-                    </button>
-                  </div>
-                </div>
-                <div className="my-1 border-t border-zinc-200" />
-                <button
-                  onClick={() => {
-                    setOpenMenu(null);
-                    onDeleteSelected();
-                  }}
-                  disabled={!hasSelection}
-                  className={`${menuItemClass} hover:bg-red-50 hover:text-red-600 disabled:hover:bg-transparent disabled:hover:text-zinc-700`}
-                  title="選択した部品・線を削除（部品・線を右クリック、またはBackspace/Deleteキーでも削除できます）"
-                >
-                  選択削除
-                </button>
-                <div className="my-1 border-t border-zinc-200" />
-                <button
-                  onClick={() => {
-                    setOpenMenu(null);
-                    onOpenLeadTime();
-                  }}
-                  className={menuItemClass}
-                  title="所要時間欄から、開始から終了までのリードタイムを集計します"
-                >
-                  リードタイム
                 </button>
               </div>
             )}
