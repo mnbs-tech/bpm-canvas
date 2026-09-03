@@ -108,7 +108,7 @@ export default function AppInfoMenu({ onOpen }: { onOpen?: () => void }) {
           >
             <div className="px-3 py-2">
               <div className="text-sm font-semibold text-zinc-800">
-                ワークフロービルダー v{VERSION}
+                bpm-canvas v{VERSION}
               </div>
               <div className="mt-0.5 text-xs text-zinc-400">
                 コミット {COMMIT}
