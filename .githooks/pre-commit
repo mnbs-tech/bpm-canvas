@@ -1,0 +1,31 @@
+#!/bin/sh
+# Guards the rule in CLAUDE.md ("Changing the saved JSON shape is a documented
+# change, always"): src/lib/types.ts defines what gets written to S3 and handed
+# to users as a downloadable file, so it must not change without the format
+# documents changing with it.
+#
+# Enable per clone:  git config core.hooksPath .githooks
+# Deliberate exception (a comment, an unrelated constant):  git commit --no-verify
+
+staged=$(git diff --cached --name-only --diff-filter=ACM)
+
+echo "$staged" | grep -qx "src/lib/types.ts" || exit 0
+
+if echo "$staged" | grep -qxE "public/workflow-format\.md|docs/SPEC\.md"; then
+  exit 0
+fi
+
+cat >&2 <<'MSG'
+✖ src/lib/types.ts is staged, but neither public/workflow-format.md nor docs/SPEC.md is.
+
+  types.ts defines the saved JSON (WorkflowDocument / WorkflowNodeData / NodeKind /
+  CURRENT_FORMAT_VERSION). If this commit changes that shape, update in the SAME commit:
+
+    1. public/workflow-format.md  - field, type, optionality, meaning, example
+    2. docs/SPEC.md §4            - data model + 互換性 (how old files are read)
+    3. CURRENT_FORMAT_VERSION     - bump only if an old reader would MISREAD a new file
+
+  See CLAUDE.md, "Changing the saved JSON shape is a documented change, always".
+  If this change genuinely does not touch the format, commit with --no-verify.
+MSG
+exit 1

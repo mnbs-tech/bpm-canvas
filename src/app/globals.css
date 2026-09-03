@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Bigger connection handles: default xyflow handles are 6x6px and hard to
+   grab precisely. Grow on hover for an easier target while dragging edges. */
+.react-flow__handle {
+  width: 12px;
+  height: 12px;
+  border: 2px solid #fff;
+}
+
+.react-flow__handle:hover {
+  width: 16px;
+  height: 16px;
+}
+
+/* Editor chrome that must not end up in an export. captureFlowImage() adds
+   .exporting to the canvas wrapper for the duration of the capture: the zoom
+   buttons, the minimap and the xyflow attribution are controls, not part of
+   the diagram, and printing them makes a PDF look like a screenshot. */
+.exporting .react-flow__controls,
+.exporting .react-flow__minimap,
+.exporting .react-flow__attribution,
+.exporting .subflow-open {
+  display: none;
+}
+
+/* AI proposal preview (src/lib/applyProposal.ts). While a proposal is being
+   reviewed the canvas is read-only and every element the diff touches wears a
+   marker class: green for what would be added, red for what would go, amber
+   for what would change. Outlines rather than borders, so nothing shifts by a
+   pixel between the preview and the applied result. */
+.react-flow__node.proposal-add,
+.react-flow__node.proposal-update,
+.react-flow__node.proposal-remove {
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+.react-flow__node.proposal-add {
+  outline: 3px solid #059669;
+}
+
+.react-flow__node.proposal-update {
+  outline: 3px solid #d97706;
+}
+
+.react-flow__node.proposal-remove {
+  outline: 3px dashed #dc2626;
+  opacity: 0.55;
+}
+
+.react-flow__node.proposal-add::after,
+.react-flow__node.proposal-update::after,
+.react-flow__node.proposal-remove::after {
+  position: absolute;
+  top: -22px;
+  left: 0;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.react-flow__node.proposal-add::after {
+  content: "追加";
+  background: #059669;
+}
+
+.react-flow__node.proposal-update::after {
+  content: "変更";
+  background: #d97706;
+}
+
+.react-flow__node.proposal-remove::after {
+  content: "削除";
+  background: #dc2626;
+}
