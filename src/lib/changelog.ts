@@ -29,6 +29,12 @@ export interface ChangelogEntry {
 /** Newest first - the dialog renders this order as-is. */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: "4.1.0",
+    date: "2026-09-03T14:50:00Z",
+    title:
+      "ライセンスダイアログの上部に、このアプリ自体のライセンス（MIT）を開くボタンを追加した",
+  },
+  {
     version: "4.0.4",
     date: "2026-09-03T14:35:00Z",
     title: "⚙️メニュー内のアプリ名表示も「bpm-canvas」に変更した",

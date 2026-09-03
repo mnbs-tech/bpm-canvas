@@ -72,7 +72,8 @@ src/
     WorkflowLibraryModal.tsx  VersionHistoryModal.tsx
     AppInfoMenu.tsx             # 右上の⚙️（版情報・変更履歴・ライセンス・仕様書DL・一式DL）
     ChangelogModal.tsx          # アプリの変更履歴ダイアログ
-    LicensesModal.tsx           # 使用OSS一覧ダイアログ
+    LicensesModal.tsx           # このアプリ自体のライセンス＋使用OSS一覧ダイアログ
+    ProductLicenseModal.tsx     # このアプリ自体のライセンス本文（LicensesModalから開く）
     nodes/                      # ノード種別ごとの見た目（index.ts で nodeTypes に登録）
   lib/
     types.ts                    # WorkflowDocument をはじめとする型と定数

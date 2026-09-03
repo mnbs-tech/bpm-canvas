@@ -1,6 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { LICENSES } from "@/lib/licenses";
+import { PRODUCT_LICENSE_NAME } from "@/lib/productLicense";
+import ProductLicenseModal from "./ProductLicenseModal";
 
 interface LicensesModalProps {
   onClose: () => void;
@@ -8,6 +11,8 @@ interface LicensesModalProps {
 
 /** OSS packages this app depends on. See `src/lib/licenses.ts` for upkeep notes. */
 export default function LicensesModal({ onClose }: LicensesModalProps) {
+  const [showProductLicense, setShowProductLicense] = useState(false);
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
@@ -21,6 +26,16 @@ export default function LicensesModal({ onClose }: LicensesModalProps) {
           <h2 className="text-sm font-semibold text-zinc-800">ライセンス</h2>
           <button onClick={onClose} className="text-zinc-400 hover:text-zinc-700">
             ✕
+          </button>
+        </div>
+
+        <div className="border-b border-zinc-200 px-2 py-2">
+          <button
+            onClick={() => setShowProductLicense(true)}
+            className="block w-full rounded-md px-2 py-2 text-left text-sm text-zinc-800 hover:bg-zinc-50"
+          >
+            {PRODUCT_LICENSE_NAME} のライセンス
+            <span className="block text-xs text-zinc-400">このアプリ自体のライセンス（MIT）</span>
           </button>
         </div>
 
@@ -51,6 +66,10 @@ export default function LicensesModal({ onClose }: LicensesModalProps) {
           このアプリが使用しているOSSパッケージの一覧です（直接の依存のみ、開発時だけ使うものは含みません）。
         </div>
       </div>
+
+      {showProductLicense && (
+        <ProductLicenseModal onClose={() => setShowProductLicense(false)} />
+      )}
     </div>
   );
 }
